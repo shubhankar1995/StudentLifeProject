@@ -47,6 +47,18 @@ def clean_time(df):
         return df
     except KeyError:
         pass
+    try:
+        df['time'] = df['start_timestamp'].apply(lambda x: time.strftime("%H:%M:%S", time.localtime(x)))
+        df['date'] = df['start_timestamp'].apply(lambda x: time.strftime("%d-%m-%Y ", time.localtime(x)))
+        return df
+    except KeyError:
+        pass
+    try:
+        df['time'] = df['end_timestamp'].apply(lambda x: time.strftime("%H:%M:%S", time.localtime(x)))
+        df['date'] = df['end_timestamp'].apply(lambda x: time.strftime("%d-%m-%Y ", time.localtime(x)))
+        return df
+    except KeyError:
+        pass
     return df
 
 def clean():

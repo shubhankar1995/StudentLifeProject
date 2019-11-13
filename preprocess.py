@@ -3,10 +3,10 @@ import time
 from scipy import stats
 import scipy
 
-data = load_csv("activity_u00.csv")
+data = pd.read_csv("/home/mustafa/StudentLife_Dataset/Inputs/sensing/activity/activity_u01.csv")
 
 data['time'] = data['timestamp'].apply(lambda x: time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(x)))
-
+data['datetime'] = pd.to_datetime(data['time'])
 data.head()
 
 data = data.set_index('datetime')
@@ -16,4 +16,4 @@ df_group.dropna(inplace=True)
 df_group = df_group.to_frame().reset_index()
 
 
-df_group
+print(df_group)

@@ -1,134 +1,156 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Nov 19 19:24:52 2019
+
+@author: Kovid
+"""
+
 import numpy as np
-import glob
 import pandas as pd
-import time
+import collections
 
-path = 'C:\\Users\Kovid\COMP9417\StudentLife_Dataset'
-    
-folders = []
-csvfiles = []
+def activity():
+    counter = 0
+    df_list = []
+    while counter<=60:
+        counter+=1
+        temp_list = []
+        if counter < 10:
+            user_id = 'u0' + str(counter)
+        else:
+            user_id = 'u' + str(counter)
+        temp_list.append(user_id)
+
+        try:
+            df = pd.read_csv('StudentLife_Dataset/Inputs/sensing/activity/activity_' + user_id + '.csv',index_col=False)
+        except:
+            continue
+
+        list_activities = df[' activity inference'].tolist()
+        count_activity = collections.Counter(list_activities)
+        most_freq = count_activity.most_common(1)
+        temp_list.append(most_freq[0][0])
+        average = (count_activity[1] + count_activity[2])/float(len(list_activities))
+        temp_list.append(round(average, 4))
+        df_list.append(temp_list)
+    dfObj = pd.DataFrame(df_list)
+    dfObj.columns = ['uid','most_freq_activity','proportion_running_walking']
+    return(dfObj)
+
+def phonelock():
+    counter = 0
+    df_list = []
+    while counter<=60:
+        counter+=1
+        temp_list = []
+        if counter < 10:
+            user_id = 'u0' + str(counter)
+        else:
+            user_id = 'u' + str(counter)
+#         temp_list.append(user_id)
+        try:
+            df = pd.read_csv('StudentLife_Dataset/Inputs/sensing/phonelock/phonelock_' + user_id + '.csv',index_col=False)
+        except:
+            continue
+
+        list_lock_duration = []
+        for index,item in df.iterrows():
+            list_lock_duration.append(item['end']-item['start'])
+        temp_list.append(np.mean(list_lock_duration))
+        temp_list.append(np.std(list_lock_duration))
+        df_list.append(temp_list)
+    dfObj = pd.DataFrame(df_list)
+    dfObj.columns = ['mean_lock_duration','std_lock']
+    return(dfObj)
+
+def coversation():
+    counter = 0
+    df_list = []
+    while counter<=60:
+        counter+=1
+        temp_list = []
+        if counter < 10:
+            user_id = 'u0' + str(counter)
+        else:
+            user_id = 'u' + str(counter)
+#         temp_list.append(user_id)
+        try:
+            df = pd.read_csv('StudentLife_Dataset/Inputs/sensing/conversation/conversation_' + user_id + '.csv',index_col=False)
+        except:
+            continue
+        total_conversations = 0
+        total_conversations=len(df)
+        temp_list.append(total_conversations)
+
+        list_timeDiff = []
+        for index,item in df.iterrows():
+            list_timeDiff.append(item[' end_timestamp']-item['start_timestamp'])
+        mean_call_duation = np.mean(list_timeDiff)
+        std_call_duration = np.std(list_timeDiff)
+        temp_list.append(mean_call_duation)
+        temp_list.append(std_call_duration)
+        df_list.append(temp_list)
+    dfObj = pd.DataFrame(df_list)
+    dfObj.columns = ['total_conversations','mean_call_duration','std_call_duration']
+    return(dfObj)
+
+def dark():
+    counter = 0
+    df_list = []
+    while counter<=60:
+        counter+=1
+        temp_list = []
+        if counter < 10:
+            user_id = 'u0' + str(counter)
+        else:
+            user_id = 'u' + str(counter)
+#         temp_list.append(user_id)
+        try:
+            df = pd.read_csv('StudentLife_Dataset/Inputs/sensing/dark/dark_' + user_id + '.csv',index_col=False)
+        except:
+            continue
+
+        list_dark_duration = []
+        for index,item in df.iterrows():
+            list_dark_duration.append(item['end']-item['start'])
+        temp_list.append(np.mean(list_dark_duration))
+        temp_list.append(np.std(list_dark_duration))
+        df_list.append(temp_list)
+    dfObj = pd.DataFrame(df_list)
+    dfObj.columns = ['mean_dark_duration','std_dark']
+    return(dfObj)
+
+def phonecharge():
+    counter = 0
+    df_list = []
+    while counter<=60:
+        counter+=1
+        temp_list = []
+        if counter < 10:
+            user_id = 'u0' + str(counter)
+        else:
+            user_id = 'u' + str(counter)
+#         temp_list.append(user_id)
+        try:
+            df = pd.read_csv('StudentLife_Dataset/Inputs/sensing/phonecharge/phonecharge_' + user_id + '.csv',index_col=False)
+        except:
+            continue
+
+        list_charge_duration = []
+        for index,item in df.iterrows():
+            list_charge_duration.append(item['end']-item['start'])
+        temp_list.append(np.mean(list_charge_duration))
+        temp_list.append(np.std(list_charge_duration))
+        df_list.append(temp_list)
+    dfObj = pd.DataFrame(df_list)
+    dfObj.columns = ['mean_charge_duration','std_charge']
+    return(dfObj)
 
 
-# r=root, d=directories, f = files
-for r, d, f in os.walk(path):
-    for folder in d:
-#         folders.append(os.path.join(r, folder))
-        p = os.path.join(r, folder)
-        os.chdir(os.path.join(r, folder))
-        file = (glob.glob('*.{}'.format('csv')))
-        for f in file:
-            csvfiles.append(p+'\\'+f)
-               
-df_fs = pd.read_csv(csvfiles[0])
-df_panas = pd.read_csv(csvfiles[1])
-inputcsv = csvfiles[2:]
-
-df_activity = [_ for _ in range(49)]   
-df_audio = [_ for _ in range(49)] 
-df_bluetooth = [_ for _ in range(49)] 
-df_conversation = [_ for _ in range(49)] 
-df_dark = [_ for _ in range(49)]   
-df_gps = [_ for _ in range(49)] 
-df_phonecharge = [_ for _ in range(49)] 
-df_phonelock = [_ for _ in range(49)] 
-df_wifi = [_ for _ in range(49)]   
-df_wifi_location = [_ for _ in range(49)] 
-
-def clean_time(df):
-    try:
-        df['time'] = df['timestamp'].apply(lambda x: time.strftime("%H:%M:%S", time.localtime(x)))
-        df['date'] = df['timestamp'].apply(lambda x: time.strftime("%d-%m-%Y ", time.localtime(x)))
-        return df
-    except KeyError:
-        pass
-    try:
-        df['time'] = df['time'].apply(lambda x: time.strftime("%H:%M:%S", time.localtime(x)))
-        df['date'] = df['time'].apply(lambda x: time.strftime("%d-%m-%Y ", time.localtime(x)))
-        return df
-    except KeyError:
-        pass
-    try:
-        df['time'] = df['start_timestamp'].apply(lambda x: time.strftime("%H:%M:%S", time.localtime(x)))
-        df['date'] = df['start_timestamp'].apply(lambda x: time.strftime("%d-%m-%Y ", time.localtime(x)))
-        return df
-    except KeyError:
-        pass
-    try:
-        df['time'] = df['end_timestamp'].apply(lambda x: time.strftime("%H:%M:%S", time.localtime(x)))
-        df['date'] = df['end_timestamp'].apply(lambda x: time.strftime("%d-%m-%Y ", time.localtime(x)))
-        return df
-    except KeyError:
-        pass
-    return df
-
-def clean():
-    ctr = 0
-    for i in range(len(inputcsv)):
-        if ctr >= 49:
-            ctr = 0
-        if 'activity' in inputcsv[i]:
-            df_activity[ctr] = pd.read_csv(inputcsv[i])
-            df_activity[ctr].replace('', np.nan, inplace=True)
-            df_activity[ctr] = clean_time(df_activity[ctr])
-            print(inputcsv[i])
-            df_activity[ctr].head()
-        if 'audio' in inputcsv[i]:
-            df_audio[ctr] = pd.read_csv(inputcsv[i])
-            df_audio[ctr].replace('', np.nan, inplace=True)
-            df_audio[ctr] = clean_time(df_audio[ctr])
-            print(inputcsv[i])
-            df_audio[ctr].head()
-        if 'bluetooth' in inputcsv[i]:
-            df_bluetooth[ctr] = pd.read_csv(inputcsv[i])
-            df_bluetooth[ctr].replace('', np.nan, inplace=True)
-            df_bluetooth[ctr] = clean_time(df_bluetooth[ctr])
-            print(inputcsv[i])
-            df_bluetooth[ctr].head()
-        if 'conversation' in inputcsv[i]:
-            df_conversation[ctr] = pd.read_csv(inputcsv[i])
-            df_conversation[ctr].replace('', np.nan, inplace=True)
-            df_conversation[ctr] = clean_time(df_conversation[ctr])
-            print(inputcsv[i])
-            df_conversation[ctr].head()
-        if 'dark' in inputcsv[i]:
-            df_dark[ctr] = pd.read_csv(inputcsv[i])
-            df_dark[ctr].replace('', np.nan, inplace=True)
-            df_dark[ctr] = clean_time(df_dark[ctr])
-            print(inputcsv[i])
-            df_dark[ctr].head()
-        if 'gps' in inputcsv[i]:
-            df_gps[ctr] = pd.read_csv(inputcsv[i])
-            df_gps[ctr].replace('', np.nan, inplace=True)
-            df_gps[ctr] = clean_time(df_gps[ctr])
-            print(inputcsv[i])
-            df_gps[ctr].head()
-        if 'phonecharge' in inputcsv[i]:
-            df_phonecharge[ctr] = pd.read_csv(inputcsv[i])
-            df_phonecharge[ctr].replace('', np.nan, inplace=True)
-            df_phonecharge[ctr] = clean_time(df_phonecharge[ctr])
-            print(inputcsv[i])
-            df_phonecharge[ctr].head()
-        if 'phonelock' in inputcsv[i]:
-            df_phonelock[ctr] = pd.read_csv(inputcsv[i])
-            df_phonelock[ctr].replace('', np.nan, inplace=True)
-            df_phonelock[ctr] = clean_time(df_phonelock[ctr])
-            print(inputcsv[i])
-            df_phonelock[ctr].head()
-        if 'wifi' in inputcsv[i]:
-            df_wifi[ctr] = pd.read_csv(inputcsv[i])
-            df_wifi[ctr].replace('', np.nan, inplace=True)
-            df_wifi[ctr] = clean_time(df_wifi[ctr])
-            print(inputcsv[i])
-            df_wifi[ctr].head()
-        if 'wifi_location' in inputcsv[i]:
-            df_wifi_location[ctr] = pd.read_csv(inputcsv[i])
-            df_wifi_location[ctr].replace('', np.nan, inplace=True)
-            df_wifi_location[ctr] = clean_time(df_wifi_location[ctr])
-            print(inputcsv[i])
-            df_wifi_location[ctr].head()
-        ctr += 1
-
-df_panas.head()
-df_fs.head()
-# clean()
-
+df1 = activity() #most_freq_activity , proportion_running_walking
+df2 = phonelock() #mean_lock_duration , std_lock
+df3 = coversation()# total_calls , total_conversations , mean_call_duration , std_call_duration
+df4 = dark() #'mean_dark_duration','std_dark'
+df5 = phonecharge()#'mean_charge_duration','std_charge'
+result = pd.concat([df1, df2, df3, df4,df5], axis=1)
+print(result)
